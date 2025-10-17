@@ -12,6 +12,8 @@ from .gemini_flash_prompts_bidirectional import GeminiFlashBidirectionalPromptFa
 from .gemini_flash_prompts_unidirectional import GeminiFlashUnidirectionalPromptFactory
 from .gpt_prompts_bidirectional import GPTBidirectionalPromptFactory
 from .gpt_prompts_unidirectional import GPTUnidirectionalPromptFactory
+from .claude_prompts_bidirectional import ClaudeBidirectionalPromptFactory
+from .claude_prompts_unidirectional import ClaudeUnidirectionalPromptFactory
 
 
 class PromptType(Enum):
@@ -37,26 +39,25 @@ class PromptFactory:
     
     def _create_prompt_factory(self) -> AbstractPromptFactory:
         """Create the appropriate prompt factory based on LLM type and prompt type."""
-        if self.llm_type == LLMType.GEMINI_FLASH:
-            if self.prompt_type == PromptType.BIDIRECTIONAL:
-                return GeminiFlashBidirectionalPromptFactory()
-            else:
+        match self.llm_type:
+            case LLMType.GEMINI_FLASH:
+                if self.prompt_type == PromptType.BIDIRECTIONAL:
+                    return GeminiFlashBidirectionalPromptFactory()
                 return GeminiFlashUnidirectionalPromptFactory()
-        elif self.llm_type == LLMType.CLAUDE or self.llm_type == LLMType.CLAUDE_SONNET:
-            if self.prompt_type == PromptType.BIDIRECTIONAL:
-                from .claude_prompts_bidirectional import ClaudeBidirectionalPromptFactory
-                return ClaudeBidirectionalPromptFactory()
-            else:
-                from .claude_prompts_unidirectional import ClaudeUnidirectionalPromptFactory
+
+            case LLMType.CLAUDE | LLMType.CLAUDE_SONNET:
+                if self.prompt_type == PromptType.BIDIRECTIONAL:
+                    return ClaudeBidirectionalPromptFactory()
                 return ClaudeUnidirectionalPromptFactory()
-        elif self.llm_type == LLMType.GPT4:
-            if self.prompt_type == PromptType.BIDIRECTIONAL:
-                return GPTBidirectionalPromptFactory()
-            else:
+
+            case LLMType.GPT4:
+                if self.prompt_type == PromptType.BIDIRECTIONAL:
+                    return GPTBidirectionalPromptFactory()
                 return GPTUnidirectionalPromptFactory()
-        else:
-            # Default fallback
-            return GeminiFlashBidirectionalPromptFactory()
+
+            case _:
+                # Default fallback
+                return GeminiFlashBidirectionalPromptFactory()
     
     def get_prompt(self, prompt_name: str) -> str:
         """Get a specific prompt by name."""
