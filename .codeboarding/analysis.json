@@ -1,9 +1,9 @@
 {
-  "description": "The CodeBoarding system orchestrates the generation of architectural documentation from source code. The process begins with the API Service receiving user requests, which are then managed by the Orchestration Engine. The Orchestration Engine coordinates the entire pipeline, interacting with the Repository Manager to fetch code, the Static Analysis Engine for deep code analysis, and the AI Interpretation Layer for generating high-level architectural insights. The Static Analysis Engine has been significantly enhanced with graph-based analysis and a more robust LSP client for detailed language-specific understanding. The AI Interpretation Layer leverages a sophisticated prompt management system to interpret static analysis data and produce architectural abstractions. Finally, the Output Generation Engine transforms these insights into various documentation formats, which are then delivered back via the API Service. The Job Database maintains the state and results of all ongoing and completed jobs.",
+  "description": "The CodeBoarding project is structured around a core AI Interpretation Layer that orchestrates the analysis of source code to generate architectural insights and documentation. User interactions, whether through a local application, VS Code extension, or GitHub Actions, are managed by the User Interface / API Gateway, which initiates and monitors analysis jobs. These jobs are persisted and managed by the Job Management & Persistence component. The AI Interpretation Layer relies on the Code Repository Access for fetching code and diffs, and the Static Analysis Engine for detailed code structure analysis. Finally, the Output Generation Engine transforms the AI-derived insights into various documentation and diagram formats, which are then presented back to the user via the User Interface / API Gateway.",
   "components": [
     {
-      "name": "API Service",
-      "description": "The external interface for CodeBoarding, handling user requests, job initiation, status retrieval, and integrating with GitHub Actions for automated documentation generation.",
+      "name": "User Interface / API Gateway",
+      "description": "The external-facing layer for users and integrations (VS Code, GitHub Actions, local CLI) to interact with the system. It initiates analysis jobs and retrieves results.",
       "referenced_source_code": [
         {
           "qualified_name": "local_app",
@@ -13,13 +13,16 @@
         }
       ],
       "assigned_files": [
-        "local_app.py"
+        "vscode_constants.py",
+        "vscode_runnable.py",
+        "local_app.py",
+        "github_action.py"
       ],
       "can_expand": true
     },
     {
-      "name": "Job Database",
-      "description": "Persistent storage for managing the lifecycle, status, and results of all documentation generation jobs.",
+      "name": "Job Management & Persistence",
+      "description": "Manages the lifecycle and state of all analysis jobs, storing job metadata, progress, and final results in a persistent database.",
       "referenced_source_code": [
         {
           "qualified_name": "duckdb_crud",
@@ -34,38 +37,14 @@
       "can_expand": false
     },
     {
-      "name": "Orchestration Engine",
-      "description": "The central control unit that manages the entire documentation generation pipeline, coordinating all analysis and generation stages.",
+      "name": "Code Repository Access",
+      "description": "Provides an interface for interacting with source code repositories, including cloning, fetching updates, and generating code differences.",
       "referenced_source_code": [
         {
-          "qualified_name": "diagram_generator",
-          "reference_file": "diagram_analysis/diagram_generator.py",
+          "qualified_name": "repo_utils.git_diff",
+          "reference_file": "repo_utils/git_diff.py",
           "reference_start_line": null,
           "reference_end_line": null
-        }
-      ],
-      "assigned_files": [
-        "diagram_analysis/__init__.py",
-        "diagram_analysis/analysis_json.py",
-        "diagram_analysis/diagram_generator.py"
-      ],
-      "can_expand": true
-    },
-    {
-      "name": "Repository Manager",
-      "description": "Manages all interactions with source code repositories, including cloning, fetching, and extracting version differences.",
-      "referenced_source_code": [
-        {
-          "qualified_name": "__init__",
-          "reference_file": "agents/diff_analyzer.py",
-          "reference_start_line": 21,
-          "reference_end_line": 32
-        },
-        {
-          "qualified_name": "git_diff",
-          "reference_file": "repo_utils/git_diff.py",
-          "reference_start_line": 27,
-          "reference_end_line": 76
         }
       ],
       "assigned_files": [
@@ -73,64 +52,20 @@
         "repo_utils/git_diff.py",
         "repo_utils/errors.py"
       ],
-      "can_expand": true
+      "can_expand": false
     },
     {
       "name": "Static Analysis Engine",
-      "description": "Performs deep, language-specific analysis of source code. This component now integrates **graph-based data structures and algorithms** for representing code relationships and control flow. It features a significantly expanded and more robust **Language Server Protocol (LSP) client**, particularly enhanced for TypeScript projects, enabling deeper interaction with language services, comprehensive TypeScript configuration scanning, and explicit reference resolution capabilities, leveraging enhanced integration with the VS Code environment.",
+      "description": "Performs deep structural analysis of source code using Language Server Protocol (LSP) clients to extract symbols, call graphs, class hierarchies, and dependencies.",
       "referenced_source_code": [
         {
-          "qualified_name": "scanner",
+          "qualified_name": "static_analyzer.scanner",
           "reference_file": "static_analyzer/scanner.py",
-          "reference_start_line": 13,
-          "reference_end_line": 82
-        },
-        {
-          "qualified_name": "client",
-          "reference_file": "static_analyzer/lsp_client/typescript_client.py",
-          "reference_start_line": 10,
-          "reference_end_line": 214
-        },
-        {
-          "qualified_name": "client",
-          "reference_file": "static_analyzer/lsp_client/client.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "graph",
-          "reference_file": "static_analyzer/graph.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "analysis_result",
-          "reference_file": "agents/abstraction_agent.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "reference_resolve_mixin",
-          "reference_file": "static_analyzer/reference_resolve_mixin.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "vscode_constants",
-          "reference_file": "vscode_constants.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "typescript_config_scanner",
-          "reference_file": "static_analyzer/typescript_config_scanner.py",
           "reference_start_line": null,
           "reference_end_line": null
         }
       ],
       "assigned_files": [
-        "vscode_constants.py",
-        "vscode_runnable.py",
         "static_analyzer/programming_language.py",
         "static_analyzer/__init__.py",
         "static_analyzer/reference_resolve_mixin.py",
@@ -146,97 +81,13 @@
     },
     {
       "name": "AI Interpretation Layer",
-      "description": "A collection of specialized AI agents that perform sophisticated interpretation of static analysis data, generating enhanced high-level architectural insights, including detailed abstractions, refined planning, robust validation, and comprehensive diff analysis. This layer now features a significantly enhanced prompt management system, utilizing an `abstract_prompt_factory` and concrete implementations (e.g., `gemini_flash_prompts_bidirectional`, `gemini_flash_prompts_unidirectional`, `claude_prompts_bidirectional`, `claude_prompts_unidirectional`) for structured prompt definition, selection, and application, supporting various language models (e.g., Gemini Flash, Claude) and prompting strategies. The `prompt_factory` has been refactored to integrate this modular and extensible system.",
+      "description": "The core intelligence layer, managing interactions with Large Language Models (LLMs) through a framework of specialized agents. It orchestrates the flow of information between static analysis and LLM interpretation to generate architectural insights, detailed analysis, validation, and diff analysis.",
       "referenced_source_code": [
         {
-          "qualified_name": "meta_agent",
-          "reference_file": "diagram_analysis/diagram_generator.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "abstraction_agent",
+          "qualified_name": "agents.abstraction_agent.AbstractionAgent",
           "reference_file": "agents/abstraction_agent.py",
           "reference_start_line": null,
           "reference_end_line": null
-        },
-        {
-          "qualified_name": "details_agent",
-          "reference_file": "agents/details_agent.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "planner_agent",
-          "reference_file": "diagram_analysis/diagram_generator.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "validator_agent",
-          "reference_file": "diagram_analysis/diagram_generator.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "diff_analyzer",
-          "reference_file": "agents/diff_analyzer.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "agent",
-          "reference_file": "agents/agent.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "agent_responses",
-          "reference_file": "agents/agent_responses.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "prompts",
-          "reference_file": "agents/details_agent.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "abstract_prompt_factory",
-          "reference_file": "agents/prompts/abstract_prompt_factory.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "gemini_flash_prompts_bidirectional",
-          "reference_file": "gemini_flash_prompts_bidirectional",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "gemini_flash_prompts_unidirectional",
-          "reference_file": "agents/prompts/gemini_flash_prompts_unidirectional.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "claude_prompts_bidirectional",
-          "reference_file": "agents/prompts/claude_prompts_bidirectional.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "claude_prompts_unidirectional",
-          "reference_file": "agents/prompts/claude_prompts_unidirectional.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "prompt_factory",
-          "reference_file": "agents/prompts/prompt_factory.py",
-          "reference_start_line": 37,
-          "reference_end_line": 53
         }
       ],
       "assigned_files": [
@@ -263,8 +114,10 @@
         "agents/tools/read_docs.py",
         "agents/prompts/__init__.py",
         "agents/prompts/claude_prompts_bidirectional.py",
+        "agents/prompts/gpt_prompts_unidirectional.py",
         "agents/prompts/gemini_flash_prompts_bidirectional.py",
         "agents/prompts/abstract_prompt_factory.py",
+        "agents/prompts/gpt_prompts_bidirectional.py",
         "agents/prompts/prompt_factory.py",
         "agents/prompts/gemini_flash_prompts_unidirectional.py",
         "agents/prompts/claude_prompts_unidirectional.py"
@@ -273,47 +126,26 @@
     },
     {
       "name": "Output Generation Engine",
-      "description": "Transforms the final, validated architectural insights into various human-readable and diagram-friendly documentation formats, with enhanced capabilities for specific output formats and external integrations like GitHub Actions.",
+      "description": "Transforms the structured architectural insights into a format suitable for various diagramming libraries and tools, and renders them into human-readable and machine-consumable documentation formats.",
       "referenced_source_code": [
         {
-          "qualified_name": "html",
-          "reference_file": "github_action.py",
-          "reference_start_line": 37,
-          "reference_end_line": 51
-        },
-        {
-          "qualified_name": "markdown",
-          "reference_file": "github_action.py",
-          "reference_start_line": 20,
-          "reference_end_line": 34
-        },
-        {
-          "qualified_name": "mdx",
-          "reference_file": "github_action.py",
-          "reference_start_line": 54,
-          "reference_end_line": 68
-        },
-        {
-          "qualified_name": "sphinx",
-          "reference_file": "output_generators/sphinx.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "github_action",
-          "reference_file": "github_action.py",
+          "qualified_name": "diagram_analysis.diagram_generator",
+          "reference_file": "diagram_analysis/diagram_generator.py",
           "reference_start_line": null,
           "reference_end_line": null
         }
       ],
       "assigned_files": [
-        "github_action.py",
         "output_generators/__init__.py",
         "output_generators/sphinx.py",
         "output_generators/mdx.py",
         "output_generators/html.py",
         "output_generators/html_template.py",
-        "output_generators/markdown.py"
+        "output_generators/markdown.py",
+        "diagram_analysis/__init__.py",
+        "diagram_analysis/analysis_json.py",
+        "diagram_analysis/diagram_generator.py",
+        "diagram_analysis/version.py"
       ],
       "can_expand": true
     },
@@ -325,77 +157,66 @@
         "utils.py",
         "setup.py",
         "demo.py",
-        "logging_config.py",
-        "diagram_analysis/version.py"
+        "logging_config.py"
       ],
       "can_expand": false
     }
   ],
   "components_relations": [
     {
-      "relation": "initiates jobs and triggers analysis within",
-      "src_name": "API Service",
-      "dst_name": "Orchestration Engine"
+      "relation": "initiates & manages jobs",
+      "src_name": "User Interface / API Gateway",
+      "dst_name": "Job Management & Persistence"
     },
     {
-      "relation": "requests GitHub Action jobs from",
-      "src_name": "API Service",
-      "dst_name": "Orchestration Engine"
+      "relation": "triggers repository operations",
+      "src_name": "User Interface / API Gateway",
+      "dst_name": "Code Repository Access"
     },
     {
-      "relation": "manages job state in",
-      "src_name": "Orchestration Engine",
-      "dst_name": "Job Database"
+      "relation": "provides job status",
+      "src_name": "Job Management & Persistence",
+      "dst_name": "User Interface / API Gateway"
     },
     {
-      "relation": "requests code from",
-      "src_name": "Orchestration Engine",
-      "dst_name": "Repository Manager"
-    },
-    {
-      "relation": "provides code to",
-      "src_name": "Repository Manager",
-      "dst_name": "Orchestration Engine"
-    },
-    {
-      "relation": "requests static analysis from",
-      "src_name": "Orchestration Engine",
+      "relation": "provides source code",
+      "src_name": "Code Repository Access",
       "dst_name": "Static Analysis Engine"
     },
     {
-      "relation": "provides richer analysis results to",
-      "src_name": "Static Analysis Engine",
-      "dst_name": "Orchestration Engine"
-    },
-    {
-      "relation": "feeds rich analysis data to",
-      "src_name": "Orchestration Engine",
+      "relation": "provides code diffs",
+      "src_name": "Code Repository Access",
       "dst_name": "AI Interpretation Layer"
     },
     {
-      "relation": "returns enhanced architectural insights to",
-      "src_name": "AI Interpretation Layer",
-      "dst_name": "Orchestration Engine"
+      "relation": "outputs static analysis data",
+      "src_name": "Static Analysis Engine",
+      "dst_name": "AI Interpretation Layer"
     },
     {
-      "relation": "queries diff information from",
+      "relation": "requests file content",
       "src_name": "AI Interpretation Layer",
-      "dst_name": "Repository Manager"
+      "dst_name": "Code Repository Access"
     },
     {
-      "relation": "passes enhanced insights for generation to",
-      "src_name": "Orchestration Engine",
+      "relation": "requests code details",
+      "src_name": "AI Interpretation Layer",
+      "dst_name": "Static Analysis Engine"
+    },
+    {
+      "relation": "stores analysis results",
+      "src_name": "AI Interpretation Layer",
+      "dst_name": "Job Management & Persistence"
+    },
+    {
+      "relation": "sends architectural insights",
+      "src_name": "AI Interpretation Layer",
       "dst_name": "Output Generation Engine"
     },
     {
-      "relation": "delivers documentation to",
+      "relation": "provides diagram data & documentation",
       "src_name": "Output Generation Engine",
-      "dst_name": "API Service"
-    },
-    {
-      "relation": "provides GitHub Action output to",
-      "src_name": "Output Generation Engine",
-      "dst_name": "API Service"
+      "dst_name": "User Interface / API Gateway"
     }
   ]
 }

@@ -1,13 +1,16 @@
 ```mermaid
 graph LR
+    AI_Interpretation_Layer["AI Interpretation Layer"]
     Output_Generation_Engine["Output Generation Engine"]
     GitHub_Action_Output_Generator["GitHub Action Output Generator"]
     Sphinx_Output_Generator["Sphinx Output Generator"]
     Unclassified["Unclassified"]
-    Output_Generation_Engine -- "initiates analysis and delegates to" --> GitHub_Action_Output_Generator
-    Output_Generation_Engine -- "initiates analysis and delegates to" --> Sphinx_Output_Generator
+    AI_Interpretation_Layer -- "provides architectural insights to" --> Output_Generation_Engine
+    Output_Generation_Engine -- "delegates output generation to" --> GitHub_Action_Output_Generator
+    Output_Generation_Engine -- "delegates output generation to" --> Sphinx_Output_Generator
     GitHub_Action_Output_Generator -- "generates" --> HTML_Markdown_MDX_documentation
     Sphinx_Output_Generator -- "generates" --> Sphinx_RST_documentation
+    click AI_Interpretation_Layer href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/AI_Interpretation_Layer.md" "Details"
     click Output_Generation_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Output_Generation_Engine.md" "Details"
 ```
 
@@ -15,10 +18,21 @@ graph LR
 
 ## Details
 
-The output generation subsystem is orchestrated by the `Output Generation Engine`, which manages the end-to-end process of transforming architectural insights into various documentation formats. This engine first performs repository setup and analysis generation, then dynamically dispatches the resulting insights to specialized generators based on the required output format. The `GitHub Action Output Generator` is responsible for producing documentation in HTML, Markdown, and MDX, primarily for integration into GitHub Actions workflows. Concurrently, the `Sphinx Output Generator` focuses on creating structured reStructuredText (RST) documentation, catering to projects that utilize Sphinx for comprehensive and customizable documentation. This modular design ensures flexibility in output formats while maintaining a clear separation of concerns for each generation process.
+The system begins with the AI Interpretation Layer, which processes raw information and generates detailed architectural insights. These insights are then fed into the Output Generation Engine, the central orchestrator responsible for managing the documentation creation process. The Output Generation Engine delegates the actual generation of specific documentation formats to specialized components. For GitHub Actions environments, the GitHub Action Output Generator creates HTML, Markdown, and MDX outputs. For projects requiring comprehensive, versioned documentation, the Sphinx Output Generator produces Sphinx-compatible (RST) documentation. This architecture ensures a clear separation of concerns, allowing for flexible and extensible documentation generation tailored to various deployment and consumption needs.
+
+### AI Interpretation Layer [[Expand]](./AI_Interpretation_Layer.md)
+This layer is responsible for processing raw information and generating comprehensive architectural insights. It leverages advanced AI prompting mechanisms to derive structured understanding, which serves as the foundational input for all subsequent documentation generation.
+
+
+**Related Classes/Methods**:
+
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/gpt_prompts_bidirectional.py" target="_blank" rel="noopener noreferrer">`agents.prompts.gpt_prompts_bidirectional`</a>
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/gpt_prompts_unidirectional.py" target="_blank" rel="noopener noreferrer">`agents.prompts.gpt_prompts_unidirectional`</a>
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/prompt_factory.py" target="_blank" rel="noopener noreferrer">`agents.prompts.prompt_factory`</a>
+
 
 ### Output Generation Engine [[Expand]](./Output_Generation_Engine.md)
-Acts as the orchestrator for the entire output generation process. It receives architectural insights, delegates to specific format generators, and manages the overall flow of documentation creation and delivery. This component is central due to its role in coordinating all output activities and integrating with upstream (AI Interpretation Layer) and downstream (API Service) components.
+Acts as the central orchestrator for the entire output generation process. It receives architectural insights from the AI Interpretation Layer, delegates to specific format generators, and manages the overall flow of documentation creation and delivery. This component is central due to its role in coordinating all output activities and integrating with upstream (AI Interpretation Layer) and downstream (specific output generators) components.
 
 
 **Related Classes/Methods**:

@@ -1,0 +1,49 @@
+{
+  "description": "The system's core functionality revolves around the `local_app` component, which acts as the primary interface for external clients. `local_app` processes incoming requests, and based on these, it initiates complex analysis workflows by interacting with the `Orchestration Engine`. To manage and track the state of these analytical tasks, `local_app` queries the `Job Database` for persistent storage of job-related information. Furthermore, `local_app` relies on the `Configuration & Utilities` component for essential operational settings and shared functionalities, ensuring a consistent and efficient execution environment. This architecture delineates clear responsibilities, with `local_app` managing external interactions, the `Orchestration Engine` orchestrating internal processes, the `Job Database` maintaining state, and `Configuration & Utilities` providing foundational support.",
+  "components": [
+    {
+      "name": "local_app",
+      "description": "This component serves as the concrete implementation of the API Gateway, handling all external interactions. It is responsible for processing requests from various clients, initiating analysis workflows through the Orchestration Engine, querying job statuses from the Job Database, and utilizing shared services from Configuration & Utilities for operational parameters and common functions.",
+      "referenced_source_code": [
+        {
+          "qualified_name": "local_app",
+          "reference_file": "local_app.py",
+          "reference_start_line": null,
+          "reference_end_line": null
+        }
+      ],
+      "assigned_files": [
+        "../../local_app.py"
+      ],
+      "can_expand": true
+    },
+    {
+      "name": "Unclassified",
+      "description": "Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)",
+      "referenced_source_code": [],
+      "assigned_files": [
+        "../../vscode_constants.py",
+        "../../vscode_runnable.py",
+        "../../github_action.py"
+      ],
+      "can_expand": false
+    }
+  ],
+  "components_relations": [
+    {
+      "relation": "initiates",
+      "src_name": "local_app",
+      "dst_name": "Orchestration Engine"
+    },
+    {
+      "relation": "queries",
+      "src_name": "local_app",
+      "dst_name": "Job Database"
+    },
+    {
+      "relation": "utilizes",
+      "src_name": "local_app",
+      "dst_name": "Configuration & Utilities"
+    }
+  ]
+}

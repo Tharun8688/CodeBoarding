@@ -1,5 +1,5 @@
 {
-  "description": "The system is structured around a Retrieval Augmented Generation (RAG) pipeline, with the Application Orchestrator serving as the central coordinator. It manages the flow from user query to response generation, leveraging the QueryProcessor for query embedding, the DocumentRetriever and VectorStore for document retrieval, and the ResponseGenerator for crafting natural language responses. The PromptFactory provides a standardized mechanism for generating and managing prompts, optimizing interactions with various language models. Operating in parallel and independently, the Static Analyzer component offers advanced static analysis capabilities, particularly for TypeScript configurations, incorporating graph-based analysis and a sophisticated Language Server Protocol (LSP) client to provide deep insights without directly influencing the RAG workflow.",
+  "description": "The system is structured around a Retrieval Augmented Generation (RAG) pattern, orchestrated by the `Application Orchestrator`. This orchestrator directs the `QueryProcessor` to handle incoming user queries, which are then processed and used by the `DocumentRetriever` to fetch relevant information from the `VectorStore`. A central `PromptFactory` provides standardized and optimized prompts for various language models, including Gemini Flash, Claude, and now GPT, which are utilized by both the `Application Orchestrator` and the `ResponseGenerator`. The `ResponseGenerator` synthesizes the retrieved documents and generated prompts to formulate the final user response. Complementing this core RAG flow, a `Static Analyzer` operates independently, offering specialized analysis capabilities, particularly for TypeScript configurations.",
   "components": [
     {
       "name": "Application Orchestrator",
@@ -57,7 +57,7 @@
       "referenced_source_code": [
         {
           "qualified_name": "langchain_community.vectorstores.chroma.Chroma:similarity_search",
-          "reference_file": "langchain_community/vectorstores/chroma.py",
+          "reference_file": "langchain_community.vectorstores.chroma.Chroma:similarity_search",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -81,7 +81,7 @@
     },
     {
       "name": "ResponseGenerator",
-      "description": "Generates a natural language response using a large language model based on the query and retrieved documents, now significantly enhanced by leveraging structured prompts from the PromptFactory, including specialized prompts for models like Gemini Flash and Claude.",
+      "description": "Generates a natural language response using a large language model based on the query and retrieved documents, now significantly enhanced by leveraging structured prompts from the PromptFactory, including specialized prompts for models like Gemini Flash, Claude, and GPT.",
       "referenced_source_code": [
         {
           "qualified_name": "langchain_core.language_models.llms.BaseLLM:invoke",
@@ -95,20 +95,22 @@
     },
     {
       "name": "PromptFactory",
-      "description": "Centralizes the creation and management of prompts for various agents and language models through an abstract factory pattern. It provides a structured and standardized approach to prompt generation, leveraging an AbstractPromptFactory interface and specialized implementations like GeminiFlashPromptsBidirectional, GeminiFlashPromptsUnidirectional, ClaudePromptsBidirectional, and ClaudePromptsUnidirectional. This ensures consistent and optimized interactions with LLMs, notably for Gemini Flash and Claude models, by managing an expanded library of prompts.",
+      "description": "Centralizes the creation and management of prompts for various agents and language models through an abstract factory pattern. It provides a structured and standardized approach to prompt generation, leveraging an AbstractPromptFactory interface and specialized implementations like GeminiFlashPromptsBidirectional, GeminiFlashPromptsUnidirectional, ClaudePromptsBidirectional, ClaudePromptsUnidirectional, GPTPromptsBidirectional, and GPTPromptsUnidirectional. This ensures consistent and optimized interactions with LLMs, notably for Gemini Flash, Claude, and GPT models, by managing an expanded library of prompts.",
       "referenced_source_code": [
         {
           "qualified_name": "prompt_factory.PromptFactory",
           "reference_file": "agents/prompts/prompt_factory.py",
-          "reference_start_line": 29,
-          "reference_end_line": 98
+          "reference_start_line": 32,
+          "reference_end_line": 108
         }
       ],
       "assigned_files": [
         "agents/prompts/__init__.py",
         "agents/prompts/claude_prompts_bidirectional.py",
+        "agents/prompts/gpt_prompts_unidirectional.py",
         "agents/prompts/gemini_flash_prompts_bidirectional.py",
         "agents/prompts/abstract_prompt_factory.py",
+        "agents/prompts/gpt_prompts_bidirectional.py",
         "agents/prompts/prompt_factory.py",
         "agents/prompts/gemini_flash_prompts_unidirectional.py",
         "agents/prompts/claude_prompts_unidirectional.py"
@@ -156,18 +158,33 @@
       "dst_name": "QueryProcessor"
     },
     {
+      "relation": "requests retrieval from",
+      "src_name": "Application Orchestrator",
+      "dst_name": "DocumentRetriever"
+    },
+    {
+      "relation": "sends context to",
+      "src_name": "Application Orchestrator",
+      "dst_name": "ResponseGenerator"
+    },
+    {
       "relation": "requests prompts from",
       "src_name": "Application Orchestrator",
       "dst_name": "PromptFactory"
     },
     {
-      "relation": "embeds query for",
+      "relation": "prepares query for",
       "src_name": "QueryProcessor",
       "dst_name": "VectorStore"
     },
     {
-      "relation": "requests retrieval from",
-      "src_name": "Application Orchestrator",
+      "relation": "stores embeddings for",
+      "src_name": "VectorStore",
+      "dst_name": "QueryProcessor"
+    },
+    {
+      "relation": "provides documents to",
+      "src_name": "VectorStore",
       "dst_name": "DocumentRetriever"
     },
     {
@@ -181,11 +198,6 @@
       "dst_name": "Application Orchestrator"
     },
     {
-      "relation": "sends context to",
-      "src_name": "Application Orchestrator",
-      "dst_name": "ResponseGenerator"
-    },
-    {
       "relation": "utilizes prompts from",
       "src_name": "ResponseGenerator",
       "dst_name": "PromptFactory"
@@ -196,7 +208,17 @@
       "dst_name": "Application Orchestrator"
     },
     {
-      "relation": "operates independently",
+      "relation": "provides prompts to",
+      "src_name": "PromptFactory",
+      "dst_name": "Application Orchestrator"
+    },
+    {
+      "relation": "provides prompts to",
+      "src_name": "PromptFactory",
+      "dst_name": "ResponseGenerator"
+    },
+    {
+      "relation": "operates independently of",
       "src_name": "Static Analyzer",
       "dst_name": "Application Orchestrator"
     }
