@@ -1,13 +1,13 @@
 {
-  "description": "The CodeBoarding project is structured around a core AI Interpretation Layer that orchestrates the analysis of source code to generate architectural insights and documentation. User interactions, whether through a local application, VS Code extension, or GitHub Actions, are managed by the User Interface / API Gateway, which initiates and monitors analysis jobs. These jobs are persisted and managed by the Job Management & Persistence component. The AI Interpretation Layer relies on the Code Repository Access for fetching code and diffs, and the Static Analysis Engine for detailed code structure analysis. Finally, the Output Generation Engine transforms the AI-derived insights into various documentation and diagram formats, which are then presented back to the user via the User Interface / API Gateway.",
+  "description": "The system is structured around a core `AI Interpretation Layer` that orchestrates code analysis. User interactions, managed by the `User Interface / API Gateway`, initiate jobs whose states are persistently tracked by `Job Management & Persistence`. Source code is acquired and managed by `Code Repository Access`, providing raw code and diffs to both the `Static Analysis Engine` for structural analysis and directly to the `AI Interpretation Layer`. The `AI Interpretation Layer` synthesizes information from static analysis and code changes, leveraging LLMs to generate architectural insights. These insights are then transformed into diagrams and documentation by the `Output Generation Engine` before being presented back to the user via the `User Interface / API Gateway`. This modular design ensures clear separation of concerns, facilitating maintainability and scalability.",
   "components": [
     {
       "name": "User Interface / API Gateway",
-      "description": "The external-facing layer for users and integrations (VS Code, GitHub Actions, local CLI) to interact with the system. It initiates analysis jobs and retrieves results.",
+      "description": "The primary entry point for users and external systems, orchestrating job creation and providing analysis results.",
       "referenced_source_code": [
         {
-          "qualified_name": "local_app",
-          "reference_file": "local_app.py",
+          "qualified_name": "UserInterfaceAPI",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -22,11 +22,11 @@
     },
     {
       "name": "Job Management & Persistence",
-      "description": "Manages the lifecycle and state of all analysis jobs, storing job metadata, progress, and final results in a persistent database.",
+      "description": "Manages the state and history of all analysis tasks, ensuring persistence of job data.",
       "referenced_source_code": [
         {
-          "qualified_name": "duckdb_crud",
-          "reference_file": "duckdb_crud.py",
+          "qualified_name": "JobManager",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -34,17 +34,17 @@
       "assigned_files": [
         "duckdb_crud.py"
       ],
-      "can_expand": false
+      "can_expand": true
     },
     {
       "name": "Code Repository Access",
-      "description": "Provides an interface for interacting with source code repositories, including cloning, fetching updates, and generating code differences.",
+      "description": "Responsible for fetching and managing source code from repositories, including generating code diffs.",
       "referenced_source_code": [
         {
-          "qualified_name": "repo_utils.git_diff",
-          "reference_file": "repo_utils/git_diff.py",
-          "reference_start_line": null,
-          "reference_end_line": null
+          "qualified_name": "CodeRepository",
+          "reference_file": "<file_path>",
+          "reference_start_line": 1,
+          "reference_end_line": 10
         }
       ],
       "assigned_files": [
@@ -52,17 +52,17 @@
         "repo_utils/git_diff.py",
         "repo_utils/errors.py"
       ],
-      "can_expand": false
+      "can_expand": true
     },
     {
       "name": "Static Analysis Engine",
-      "description": "Performs deep structural analysis of source code using Language Server Protocol (LSP) clients to extract symbols, call graphs, class hierarchies, and dependencies.",
+      "description": "Performs structural analysis of source code and provides findings to the AI Interpretation Layer.",
       "referenced_source_code": [
         {
-          "qualified_name": "static_analyzer.scanner",
-          "reference_file": "static_analyzer/scanner.py",
-          "reference_start_line": null,
-          "reference_end_line": null
+          "qualified_name": "StaticAnalyzer",
+          "reference_file": "static_analyzer/__init__.py",
+          "reference_start_line": 44,
+          "reference_end_line": 67
         }
       ],
       "assigned_files": [
@@ -81,11 +81,11 @@
     },
     {
       "name": "AI Interpretation Layer",
-      "description": "The core intelligence layer, managing interactions with Large Language Models (LLMs) through a framework of specialized agents. It orchestrates the flow of information between static analysis and LLM interpretation to generate architectural insights, detailed analysis, validation, and diff analysis.",
+      "description": "The core intelligence component, leveraging static analysis data and code diffs to generate architectural insights using LLM agents.",
       "referenced_source_code": [
         {
-          "qualified_name": "agents.abstraction_agent.AbstractionAgent",
-          "reference_file": "agents/abstraction_agent.py",
+          "qualified_name": "AIInterpreter",
+          "reference_file": "No files were provided to choose from. Please provide a list of files to search within.",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -126,11 +126,11 @@
     },
     {
       "name": "Output Generation Engine",
-      "description": "Transforms the structured architectural insights into a format suitable for various diagramming libraries and tools, and renders them into human-readable and machine-consumable documentation formats.",
+      "description": "Transforms architectural insights into consumable documentation and diagrams.",
       "referenced_source_code": [
         {
-          "qualified_name": "diagram_analysis.diagram_generator",
-          "reference_file": "diagram_analysis/diagram_generator.py",
+          "qualified_name": "OutputGenerator",
+          "reference_file": "OutputGenerator",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -147,7 +147,7 @@
         "diagram_analysis/diagram_generator.py",
         "diagram_analysis/version.py"
       ],
-      "can_expand": true
+      "can_expand": false
     },
     {
       "name": "Unclassified",

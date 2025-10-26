@@ -1,13 +1,13 @@
 {
-  "description": "The system is structured around a Retrieval Augmented Generation (RAG) pattern, orchestrated by the `Application Orchestrator`. This orchestrator directs the `QueryProcessor` to handle incoming user queries, which are then processed and used by the `DocumentRetriever` to fetch relevant information from the `VectorStore`. A central `PromptFactory` provides standardized and optimized prompts for various language models, including Gemini Flash, Claude, and now GPT, which are utilized by both the `Application Orchestrator` and the `ResponseGenerator`. The `ResponseGenerator` synthesizes the retrieved documents and generated prompts to formulate the final user response. Complementing this core RAG flow, a `Static Analyzer` operates independently, offering specialized analysis capabilities, particularly for TypeScript configurations.",
+  "description": "The AI Interpretation Layer serves as the intelligent core of the system, responsible for processing various inputs to generate architectural insights. The `AIInterpreter` acts as the central orchestrator, coordinating the flow of information and tasks. It leverages the `PromptGenerator` to craft context-rich prompts based on static analysis data and code diffs. These prompts are then sent to the `LLMAgentManager`, which handles the complexities of interacting with diverse LLM providers, ensuring efficient and reliable communication. Upon receiving responses from the LLMs, the `AIInterpreter` forwards them to the `ResponseParser` for validation, extraction, and transformation into structured architectural insights. Finally, the `KnowledgeBase` is utilized by the `AIInterpreter` to store and retrieve past insights, enhancing the accuracy and consistency of future analyses. This layered approach ensures a modular, scalable, and maintainable architecture for AI-driven architectural analysis.",
   "components": [
     {
-      "name": "Application Orchestrator",
-      "description": "Manages the overall application flow, coordinating interactions between QueryProcessor, DocumentRetriever, ResponseGenerator, and leveraging the PromptFactory for agent prompt generation. It receives user queries and delivers final responses, adapting its agent coordination mechanisms due to recent core agent logic refactoring and the new prompt management system.",
+      "name": "AIInterpreter",
+      "description": "The core intelligence component, orchestrating the entire AI interpretation process. It receives input data (static analysis, code diffs), selects and invokes LLM agents, manages prompt generation, parses LLM responses, and ultimately generates architectural insights.",
       "referenced_source_code": [
         {
-          "qualified_name": "agents.agent",
-          "reference_file": "agents/agent.py",
+          "qualified_name": "AIInterpreter",
+          "reference_file": "No files were provided to search within. Please provide a list of files to choose from.",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -20,7 +20,6 @@
         "../../agents/abstraction_agent.py",
         "../../agents/planner_agent.py",
         "../../agents/meta_agent.py",
-        "../../agents/agent_responses.py",
         "../../agents/agent.py",
         "../../agents/tools/read_source.py",
         "../../agents/tools/read_file_structure.py",
@@ -38,12 +37,12 @@
       "can_expand": true
     },
     {
-      "name": "QueryProcessor",
-      "description": "Handles incoming user queries, embeds them, and prepares them for similarity search, potentially utilizing refined prompts from the PromptFactory for enhanced query understanding.",
+      "name": "LLMAgentManager",
+      "description": "Manages interactions with various LLM providers (e.g., OpenAI, Anthropic, Google Gemini, AWS Bedrock, Ollama). It handles configuration loading, request routing, API key management, authentication, retry mechanisms, and rate limiting, abstracting these complexities from the `AIInterpreter`.",
       "referenced_source_code": [
         {
-          "qualified_name": "langchain_core.embeddings.Embeddings:embed_query",
-          "reference_file": ".",
+          "qualified_name": "LLMAgentManager",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -52,56 +51,14 @@
       "can_expand": true
     },
     {
-      "name": "VectorStore",
-      "description": "Stores and retrieves document embeddings based on similarity search.",
+      "name": "PromptGenerator",
+      "description": "Responsible for dynamically constructing effective and context-rich prompts for the LLMs. It integrates static analysis data, code diffs, and specific task instructions to formulate queries that yield relevant architectural insights.",
       "referenced_source_code": [
         {
-          "qualified_name": "langchain_community.vectorstores.chroma.Chroma:similarity_search",
-          "reference_file": "langchain_community.vectorstores.chroma.Chroma:similarity_search",
+          "qualified_name": "PromptGenerator",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
-        }
-      ],
-      "assigned_files": [],
-      "can_expand": true
-    },
-    {
-      "name": "DocumentRetriever",
-      "description": "Retrieves relevant documents from the vector store.",
-      "referenced_source_code": [
-        {
-          "qualified_name": "langchain_core.retrievers.BaseRetriever:get_relevant_documents",
-          "reference_file": ".",
-          "reference_start_line": null,
-          "reference_end_line": null
-        }
-      ],
-      "assigned_files": [],
-      "can_expand": false
-    },
-    {
-      "name": "ResponseGenerator",
-      "description": "Generates a natural language response using a large language model based on the query and retrieved documents, now significantly enhanced by leveraging structured prompts from the PromptFactory, including specialized prompts for models like Gemini Flash, Claude, and GPT.",
-      "referenced_source_code": [
-        {
-          "qualified_name": "langchain_core.language_models.llms.BaseLLM:invoke",
-          "reference_file": ".",
-          "reference_start_line": null,
-          "reference_end_line": null
-        }
-      ],
-      "assigned_files": [],
-      "can_expand": true
-    },
-    {
-      "name": "PromptFactory",
-      "description": "Centralizes the creation and management of prompts for various agents and language models through an abstract factory pattern. It provides a structured and standardized approach to prompt generation, leveraging an AbstractPromptFactory interface and specialized implementations like GeminiFlashPromptsBidirectional, GeminiFlashPromptsUnidirectional, ClaudePromptsBidirectional, ClaudePromptsUnidirectional, GPTPromptsBidirectional, and GPTPromptsUnidirectional. This ensures consistent and optimized interactions with LLMs, notably for Gemini Flash, Claude, and GPT models, by managing an expanded library of prompts.",
-      "referenced_source_code": [
-        {
-          "qualified_name": "prompt_factory.PromptFactory",
-          "reference_file": "agents/prompts/prompt_factory.py",
-          "reference_start_line": 32,
-          "reference_end_line": 108
         }
       ],
       "assigned_files": [
@@ -118,24 +75,28 @@
       "can_expand": true
     },
     {
-      "name": "Static Analyzer",
-      "description": "An independent functional area responsible for performing static analysis, primarily focusing on TypeScript configurations. This component has been significantly enhanced with the integration of a dedicated Language Server Protocol (LSP) client for TypeScript, enabling more sophisticated and in-depth analysis by leveraging the full capabilities of a TypeScript Language Server. It now also incorporates graph-based analysis capabilities to provide deeper insights. It operates in parallel to the core RAG system, providing distinct capabilities without directly altering the RAG data flow.",
+      "name": "ResponseParser",
+      "description": "Parses, validates, and extracts structured information from the raw outputs received from the LLMs. It handles potential errors, malformed responses, and transforms the LLM's natural language output into a usable format for architectural insights.",
       "referenced_source_code": [
         {
-          "qualified_name": "static_analyzer.typescript_config_scanner",
-          "reference_file": "static_analyzer/typescript_config_scanner.py",
+          "qualified_name": "ResponseParser",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
-        },
+        }
+      ],
+      "assigned_files": [
+        "../../agents/agent_responses.py"
+      ],
+      "can_expand": true
+    },
+    {
+      "name": "KnowledgeBase",
+      "description": "Stores and retrieves previously generated insights, architectural patterns, or domain-specific knowledge. This component helps improve the consistency, accuracy, and efficiency of future interpretations by leveraging past analyses.",
+      "referenced_source_code": [
         {
-          "qualified_name": "static_analyzer.lsp_client.typescript_client",
-          "reference_file": "static_analyzer/lsp_client/typescript_client.py",
-          "reference_start_line": null,
-          "reference_end_line": null
-        },
-        {
-          "qualified_name": "static_analyzer.graph",
-          "reference_file": "static_analyzer/graph.py",
+          "qualified_name": "KnowledgeBase",
+          "reference_file": "",
           "reference_start_line": null,
           "reference_end_line": null
         }
@@ -153,74 +114,44 @@
   ],
   "components_relations": [
     {
-      "relation": "initiates",
-      "src_name": "Application Orchestrator",
-      "dst_name": "QueryProcessor"
+      "relation": "sends LLM requests to",
+      "src_name": "AIInterpreter",
+      "dst_name": "LLMAgentManager"
     },
     {
-      "relation": "requests retrieval from",
-      "src_name": "Application Orchestrator",
-      "dst_name": "DocumentRetriever"
+      "relation": "returns LLM responses to",
+      "src_name": "LLMAgentManager",
+      "dst_name": "AIInterpreter"
     },
     {
-      "relation": "sends context to",
-      "src_name": "Application Orchestrator",
-      "dst_name": "ResponseGenerator"
+      "relation": "requests prompt generation from",
+      "src_name": "AIInterpreter",
+      "dst_name": "PromptGenerator"
     },
     {
-      "relation": "requests prompts from",
-      "src_name": "Application Orchestrator",
-      "dst_name": "PromptFactory"
+      "relation": "generates and provides prompts to",
+      "src_name": "PromptGenerator",
+      "dst_name": "AIInterpreter"
     },
     {
-      "relation": "prepares query for",
-      "src_name": "QueryProcessor",
-      "dst_name": "VectorStore"
+      "relation": "sends LLM outputs for parsing to",
+      "src_name": "AIInterpreter",
+      "dst_name": "ResponseParser"
     },
     {
-      "relation": "stores embeddings for",
-      "src_name": "VectorStore",
-      "dst_name": "QueryProcessor"
+      "relation": "returns structured insights to",
+      "src_name": "ResponseParser",
+      "dst_name": "AIInterpreter"
     },
     {
-      "relation": "provides documents to",
-      "src_name": "VectorStore",
-      "dst_name": "DocumentRetriever"
+      "relation": "queries and updates",
+      "src_name": "AIInterpreter",
+      "dst_name": "KnowledgeBase"
     },
     {
-      "relation": "queries",
-      "src_name": "DocumentRetriever",
-      "dst_name": "VectorStore"
-    },
-    {
-      "relation": "provides documents to",
-      "src_name": "DocumentRetriever",
-      "dst_name": "Application Orchestrator"
-    },
-    {
-      "relation": "utilizes prompts from",
-      "src_name": "ResponseGenerator",
-      "dst_name": "PromptFactory"
-    },
-    {
-      "relation": "returns response to",
-      "src_name": "ResponseGenerator",
-      "dst_name": "Application Orchestrator"
-    },
-    {
-      "relation": "provides prompts to",
-      "src_name": "PromptFactory",
-      "dst_name": "Application Orchestrator"
-    },
-    {
-      "relation": "provides prompts to",
-      "src_name": "PromptFactory",
-      "dst_name": "ResponseGenerator"
-    },
-    {
-      "relation": "operates independently of",
-      "src_name": "Static Analyzer",
-      "dst_name": "Application Orchestrator"
+      "relation": "provides stored insights to",
+      "src_name": "KnowledgeBase",
+      "dst_name": "AIInterpreter"
     }
   ]
 }

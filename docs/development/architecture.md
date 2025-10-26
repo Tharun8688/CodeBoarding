@@ -2,99 +2,67 @@
 
 ```mermaid
 graph LR
-    Application_Orchestrator["Application Orchestrator"]
-    QueryProcessor["QueryProcessor"]
-    VectorStore["VectorStore"]
-    DocumentRetriever["DocumentRetriever"]
-    ResponseGenerator["ResponseGenerator"]
-    PromptFactory["PromptFactory"]
-    Static_Analyzer["Static Analyzer"]
+    AIInterpreter["AIInterpreter"]
+    LLMAgentManager["LLMAgentManager"]
+    PromptGenerator["PromptGenerator"]
+    ResponseParser["ResponseParser"]
+    KnowledgeBase["KnowledgeBase"]
     Unclassified["Unclassified"]
-    Application_Orchestrator -- "initiates" --> QueryProcessor
-    Application_Orchestrator -- "requests retrieval from" --> DocumentRetriever
-    Application_Orchestrator -- "sends context to" --> ResponseGenerator
-    Application_Orchestrator -- "requests prompts from" --> PromptFactory
-    QueryProcessor -- "prepares query for" --> VectorStore
-    VectorStore -- "stores embeddings for" --> QueryProcessor
-    VectorStore -- "provides documents to" --> DocumentRetriever
-    DocumentRetriever -- "queries" --> VectorStore
-    DocumentRetriever -- "provides documents to" --> Application_Orchestrator
-    ResponseGenerator -- "utilizes prompts from" --> PromptFactory
-    ResponseGenerator -- "returns response to" --> Application_Orchestrator
-    PromptFactory -- "provides prompts to" --> Application_Orchestrator
-    PromptFactory -- "provides prompts to" --> ResponseGenerator
-    Static_Analyzer -- "operates independently of" --> Application_Orchestrator
+    AIInterpreter -- "sends LLM requests to" --> LLMAgentManager
+    LLMAgentManager -- "returns LLM responses to" --> AIInterpreter
+    AIInterpreter -- "requests prompt generation from" --> PromptGenerator
+    PromptGenerator -- "generates and provides prompts to" --> AIInterpreter
+    AIInterpreter -- "sends LLM outputs for parsing to" --> ResponseParser
+    ResponseParser -- "returns structured insights to" --> AIInterpreter
+    AIInterpreter -- "queries and updates" --> KnowledgeBase
+    KnowledgeBase -- "provides stored insights to" --> AIInterpreter
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-The system is structured around a Retrieval Augmented Generation (RAG) pattern, orchestrated by the `Application Orchestrator`. This orchestrator directs the `QueryProcessor` to handle incoming user queries, which are then processed and used by the `DocumentRetriever` to fetch relevant information from the `VectorStore`. A central `PromptFactory` provides standardized and optimized prompts for various language models, including Gemini Flash, Claude, and now GPT, which are utilized by both the `Application Orchestrator` and the `ResponseGenerator`. The `ResponseGenerator` synthesizes the retrieved documents and generated prompts to formulate the final user response. Complementing this core RAG flow, a `Static Analyzer` operates independently, offering specialized analysis capabilities, particularly for TypeScript configurations.
+The AI Interpretation Layer serves as the intelligent core of the system, responsible for processing various inputs to generate architectural insights. The `AIInterpreter` acts as the central orchestrator, coordinating the flow of information and tasks. It leverages the `PromptGenerator` to craft context-rich prompts based on static analysis data and code diffs. These prompts are then sent to the `LLMAgentManager`, which handles the complexities of interacting with diverse LLM providers, ensuring efficient and reliable communication. Upon receiving responses from the LLMs, the `AIInterpreter` forwards them to the `ResponseParser` for validation, extraction, and transformation into structured architectural insights. Finally, the `KnowledgeBase` is utilized by the `AIInterpreter` to store and retrieve past insights, enhancing the accuracy and consistency of future analyses. This layered approach ensures a modular, scalable, and maintainable architecture for AI-driven architectural analysis.
 
-### Application Orchestrator
-Manages the overall application flow, coordinating interactions between QueryProcessor, DocumentRetriever, ResponseGenerator, and leveraging the PromptFactory for agent prompt generation. It receives user queries and delivers final responses, adapting its agent coordination mechanisms due to recent core agent logic refactoring and the new prompt management system.
-
-
-**Related Classes/Methods**:
-
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/agent.py" target="_blank" rel="noopener noreferrer">`agents.agent`</a>
-
-
-### QueryProcessor
-Handles incoming user queries, embeds them, and prepares them for similarity search, potentially utilizing refined prompts from the PromptFactory for enhanced query understanding.
+### AIInterpreter
+The core intelligence component, orchestrating the entire AI interpretation process. It receives input data (static analysis, code diffs), selects and invokes LLM agents, manages prompt generation, parses LLM responses, and ultimately generates architectural insights.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/main." target="_blank" rel="noopener noreferrer">`langchain_core.embeddings.Embeddings:embed_query`</a>
+- `AIInterpreter`
 
 
-### VectorStore
-Stores and retrieves document embeddings based on similarity search.
-
-
-**Related Classes/Methods**:
-
-- `langchain_community.vectorstores.chroma.Chroma:similarity_search`
-
-
-### DocumentRetriever
-Retrieves relevant documents from the vector store.
+### LLMAgentManager
+Manages interactions with various LLM providers (e.g., OpenAI, Anthropic, Google Gemini, AWS Bedrock, Ollama). It handles configuration loading, request routing, API key management, authentication, retry mechanisms, and rate limiting, abstracting these complexities from the `AIInterpreter`.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/main." target="_blank" rel="noopener noreferrer">`langchain_core.retrievers.BaseRetriever:get_relevant_documents`</a>
 
 
-### ResponseGenerator
-Generates a natural language response using a large language model based on the query and retrieved documents, now significantly enhanced by leveraging structured prompts from the PromptFactory, including specialized prompts for models like Gemini Flash, Claude, and GPT.
-
-
-**Related Classes/Methods**:
-
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/main." target="_blank" rel="noopener noreferrer">`langchain_core.language_models.llms.BaseLLM:invoke`</a>
-
-
-### PromptFactory
-Centralizes the creation and management of prompts for various agents and language models through an abstract factory pattern. It provides a structured and standardized approach to prompt generation, leveraging an AbstractPromptFactory interface and specialized implementations like GeminiFlashPromptsBidirectional, GeminiFlashPromptsUnidirectional, ClaudePromptsBidirectional, ClaudePromptsUnidirectional, GPTPromptsBidirectional, and GPTPromptsUnidirectional. This ensures consistent and optimized interactions with LLMs, notably for Gemini Flash, Claude, and GPT models, by managing an expanded library of prompts.
+### PromptGenerator
+Responsible for dynamically constructing effective and context-rich prompts for the LLMs. It integrates static analysis data, code diffs, and specific task instructions to formulate queries that yield relevant architectural insights.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/prompt_factory.py#L32-L108" target="_blank" rel="noopener noreferrer">`prompt_factory.PromptFactory`:32-108</a>
 
 
-### Static Analyzer
-An independent functional area responsible for performing static analysis, primarily focusing on TypeScript configurations. This component has been significantly enhanced with the integration of a dedicated Language Server Protocol (LSP) client for TypeScript, enabling more sophisticated and in-depth analysis by leveraging the full capabilities of a TypeScript Language Server. It now also incorporates graph-based analysis capabilities to provide deeper insights. It operates in parallel to the core RAG system, providing distinct capabilities without directly altering the RAG data flow.
+### ResponseParser
+Parses, validates, and extracts structured information from the raw outputs received from the LLMs. It handles potential errors, malformed responses, and transforms the LLM's natural language output into a usable format for architectural insights.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainstatic_analyzer/typescript_config_scanner.py" target="_blank" rel="noopener noreferrer">`static_analyzer.typescript_config_scanner`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainstatic_analyzer/lsp_client/typescript_client.py" target="_blank" rel="noopener noreferrer">`static_analyzer.lsp_client.typescript_client`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainstatic_analyzer/graph.py" target="_blank" rel="noopener noreferrer">`static_analyzer.graph`</a>
+
+
+### KnowledgeBase
+Stores and retrieves previously generated insights, architectural patterns, or domain-specific knowledge. This component helps improve the consistency, accuracy, and efficiency of future interpretations by leveraging past analyses.
+
+
+**Related Classes/Methods**:
+
 
 
 ### Unclassified
@@ -110,65 +78,104 @@ Component for all unclassified files and utility functions (Utility functions/Ex
 
 ```mermaid
 graph LR
-    AI_Interpretation_Layer["AI Interpretation Layer"]
-    Output_Generation_Engine["Output Generation Engine"]
-    GitHub_Action_Output_Generator["GitHub Action Output Generator"]
-    Sphinx_Output_Generator["Sphinx Output Generator"]
+    Document_Ingestion["Document Ingestion"]
+    Text_Splitter["Text Splitter"]
+    Vector_Store["Vector Store"]
+    Embeddings_Model["Embeddings Model"]
+    Language_Model_LLM_["Language Model (LLM)"]
+    Retrieval_Chain["Retrieval Chain"]
     Unclassified["Unclassified"]
-    AI_Interpretation_Layer -- "provides architectural insights to" --> Output_Generation_Engine
-    Output_Generation_Engine -- "delegates output generation to" --> GitHub_Action_Output_Generator
-    Output_Generation_Engine -- "delegates output generation to" --> Sphinx_Output_Generator
-    GitHub_Action_Output_Generator -- "generates" --> HTML_Markdown_MDX_documentation
-    Sphinx_Output_Generator -- "generates" --> Sphinx_RST_documentation
-    click AI_Interpretation_Layer href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/AI_Interpretation_Layer.md" "Details"
-    click Output_Generation_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Output_Generation_Engine.md" "Details"
+    Document_Ingestion -- "loads documents into" --> Text_Splitter
+    Text_Splitter -- "splits text for" --> Embeddings_Model
+    Embeddings_Model -- "generates embeddings for" --> Vector_Store
+    Vector_Store -- "stores embeddings from" --> Embeddings_Model
+    Vector_Store -- "retrieves context for" --> Retrieval_Chain
+    Retrieval_Chain -- "uses" --> Language_Model_LLM_
+    Language_Model_LLM_ -- "answers queries using" --> Retrieval_Chain
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-The system begins with the AI Interpretation Layer, which processes raw information and generates detailed architectural insights. These insights are then fed into the Output Generation Engine, the central orchestrator responsible for managing the documentation creation process. The Output Generation Engine delegates the actual generation of specific documentation formats to specialized components. For GitHub Actions environments, the GitHub Action Output Generator creates HTML, Markdown, and MDX outputs. For projects requiring comprehensive, versioned documentation, the Sphinx Output Generator produces Sphinx-compatible (RST) documentation. This architecture ensures a clear separation of concerns, allowing for flexible and extensible documentation generation tailored to various deployment and consumption needs.
+This graph represents the core functionality of a document processing and question-answering system. The main flow involves ingesting documents, processing them into a searchable format, and then using a language model to answer user queries based on the ingested content. Its purpose is to provide an intelligent interface for users to retrieve information from a collection of documents.
 
-### AI Interpretation Layer [[Expand]](./AI_Interpretation_Layer.md)
-This layer is responsible for processing raw information and generating comprehensive architectural insights. It leverages advanced AI prompting mechanisms to derive structured understanding, which serves as the foundational input for all subsequent documentation generation.
-
-
-**Related Classes/Methods**:
-
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/gpt_prompts_bidirectional.py" target="_blank" rel="noopener noreferrer">`agents.prompts.gpt_prompts_bidirectional`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/gpt_prompts_unidirectional.py" target="_blank" rel="noopener noreferrer">`agents.prompts.gpt_prompts_unidirectional`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/prompts/prompt_factory.py" target="_blank" rel="noopener noreferrer">`agents.prompts.prompt_factory`</a>
-
-
-### Output Generation Engine [[Expand]](./Output_Generation_Engine.md)
-Acts as the central orchestrator for the entire output generation process. It receives architectural insights from the AI Interpretation Layer, delegates to specific format generators, and manages the overall flow of documentation creation and delivery. This component is central due to its role in coordinating all output activities and integrating with upstream (AI Interpretation Layer) and downstream (specific output generators) components.
+### Document Ingestion
+Handles the loading and initial processing of various document types.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/maingithub_action.py" target="_blank" rel="noopener noreferrer">`github_action.generate_analysis`</a>
+- `langchain_community.document_loaders.pdf.PyPDFLoader`
+- `langchain_community.document_loaders.csv_loader.CSVLoader`
 
 
-### GitHub Action Output Generator
-Specializes in generating documentation outputs tailored for GitHub Actions workflows. It handles the creation of HTML, Markdown, and MDX formats, ensuring compatibility and proper structuring for automated deployment within a GitHub Actions environment. This component is crucial for enabling automated documentation updates and integration into CI/CD pipelines.
-
-
-**Related Classes/Methods**:
-
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/maingithub_action.py" target="_blank" rel="noopener noreferrer">`github_action.generate_html`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/maingithub_action.py" target="_blank" rel="noopener noreferrer">`github_action.generate_markdown`</a>
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/maingithub_action.py" target="_blank" rel="noopener noreferrer">`github_action.generate_mdx`</a>
-
-
-### Sphinx Output Generator
-Focuses exclusively on generating documentation in the Sphinx format. It processes the architectural insights and renders them into the structured and extensible format required by Sphinx, including reStructuredText or MyST Markdown. This component is vital for projects requiring comprehensive, versioned, and highly customizable documentation.
+### Text Splitter
+Breaks down large documents into smaller, manageable chunks for efficient processing and embedding.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainoutput_generators/sphinx.py" target="_blank" rel="noopener noreferrer">`output_generators.sphinx.generate_rst_file`</a>
+- `langchain.text_splitter.RecursiveCharacterTextSplitter`
 
+
+### Vector Store
+Stores and retrieves document embeddings, enabling semantic search.
+
+
+**Related Classes/Methods**:
+
+- `langchain_community.vectorstores.chroma.Chroma`
+
+
+### Embeddings Model
+Generates numerical representations (embeddings) of text chunks.
+
+
+**Related Classes/Methods**:
+
+- `langchain_community.embeddings.ollama.OllamaEmbeddings`
+
+
+### Language Model (LLM)
+Processes user queries and generates answers based on retrieved context.
+
+
+**Related Classes/Methods**:
+
+- `langchain_community.llms.ollama.Ollama`
+
+
+### Retrieval Chain
+Orchestrates the retrieval of relevant document chunks and passes them to the LLM for answer generation.
+
+
+**Related Classes/Methods**:
+
+- `langchain.chains.retrieval.create_retrieval_chain`
+
+
+### Unclassified
+Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
+
+
+**Related Classes/Methods**: _None_
+
+
+
+### [FAQ](https://github.com/CodeBoarding/GeneratedOnBoardings/tree/main?tab=readme-ov-file#faq)
+
+
+```mermaid
+graph LR
+    Unclassified["Unclassified"]
+```
+
+[![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
+
+## Details
+
+The feedback highlights that the identified components (JobManager, PersistenceLayer, QueueingMechanism, OrchestrationEngine, APIServiceGateway, OutputGenerationEngine) have incorrect references, as no such modules, functions, or classes exist in the project. The `getFileStructure` output reveals a `.codeboarding` directory containing several `.json` and `.md` files, which likely hold architectural descriptions. To address the feedback, I will first examine the `overview.md` file within the `.codeboarding` directory to gain a high-level understanding of the project's architecture and then investigate other `.md` files for specific component definitions. This approach will help in identifying the correct references for the conceptual components.
 
 ### Unclassified
 Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
@@ -280,25 +287,66 @@ Component for all unclassified files and utility functions (Utility functions/Ex
 ```mermaid
 graph LR
     local_app["local_app"]
+    Orchestration_Engine["Orchestration Engine"]
+    Job_Database["Job Database"]
+    Configuration_Utilities["Configuration & Utilities"]
+    Unclassified["Unclassified"]
     Unclassified["Unclassified"]
     local_app -- "initiates" --> Orchestration_Engine
     local_app -- "queries" --> Job_Database
     local_app -- "utilizes" --> Configuration_Utilities
+    local_app -- "utilizes" --> Unclassified
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-The system's core functionality revolves around the `local_app` component, which acts as the primary interface for external clients. `local_app` processes incoming requests, and based on these, it initiates complex analysis workflows by interacting with the `Orchestration Engine`. To manage and track the state of these analytical tasks, `local_app` queries the `Job Database` for persistent storage of job-related information. Furthermore, `local_app` relies on the `Configuration & Utilities` component for essential operational settings and shared functionalities, ensuring a consistent and efficient execution environment. This architecture delineates clear responsibilities, with `local_app` managing external interactions, the `Orchestration Engine` orchestrating internal processes, the `Job Database` maintaining state, and `Configuration & Utilities` providing foundational support.
+The system's architecture is centered around the `local_app` component, which acts as the primary API Gateway, managing all external client interactions. It orchestrates analysis workflows by initiating tasks with the `Orchestration Engine` and monitors their progress by querying the `Job Database`. For operational parameters and common functionalities, `local_app` leverages shared services from `Configuration & Utilities`. The system also incorporates an `Unclassified` component, which has recently evolved to include an expanded `repo_utils` package with enhanced utilities, particularly for git diff functionalities, and updated GPT prompt definitions within `agents/prompts`, significantly influencing agent behavior. This `Unclassified` component provides essential underlying functionalities utilized by `local_app` and potentially other parts of the system.
 
 ### local_app
-This component serves as the concrete implementation of the API Gateway, handling all external interactions. It is responsible for processing requests from various clients, initiating analysis workflows through the Orchestration Engine, querying job statuses from the Job Database, and utilizing shared services from Configuration & Utilities for operational parameters and common functions.
+This component serves as the concrete implementation of the API Gateway, handling all external interactions. It is responsible for processing requests from various clients, initiating analysis workflows, querying job statuses, and utilizing shared services for operational parameters and common functions.
 
 
 **Related Classes/Methods**:
 
 - <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainlocal_app.py" target="_blank" rel="noopener noreferrer">`local_app`</a>
+
+
+### Orchestration Engine
+Responsible for initiating and managing analysis workflows as requested by the `local_app` component.
+
+
+**Related Classes/Methods**:
+
+
+
+### Job Database
+Stores and provides persistent storage for job statuses and related data, which can be queried by the `local_app` component.
+
+
+**Related Classes/Methods**:
+
+- `JobDatabase`:1-10
+
+
+### Configuration & Utilities
+Provides shared services, operational parameters, and common utility functions utilized across various components, including `local_app`.
+
+
+**Related Classes/Methods**:
+
+- `ConfigurationAndUtilities`
+
+
+### Unclassified
+This component encompasses various utility functions, external libraries, and dependencies. It now includes an expanded and reorganized `repo_utils` package, offering enhanced and more accessible utilities, particularly with refactored git diff functionalities. Additionally, it contains updated and refactored GPT prompt definitions within the `agents/prompts` module, which significantly impacts the behavior and intelligence of agents utilizing these prompts.
+
+
+**Related Classes/Methods**:
+
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainrepo_utils" target="_blank" rel="noopener noreferrer">`repo_utils`</a>
+- `agents.prompts`
 
 
 ### Unclassified
@@ -333,69 +381,68 @@ graph LR
     AI_Interpretation_Layer -- "sends architectural insights" --> Output_Generation_Engine
     Output_Generation_Engine -- "provides diagram data & documentation" --> User_Interface_API_Gateway
     click User_Interface_API_Gateway href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/User_Interface_API_Gateway.md" "Details"
+    click Job_Management_Persistence href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Job_Management_Persistence.md" "Details"
+    click Code_Repository_Access href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Code_Repository_Access.md" "Details"
     click Static_Analysis_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Static_Analysis_Engine.md" "Details"
     click AI_Interpretation_Layer href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/AI_Interpretation_Layer.md" "Details"
-    click Output_Generation_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Output_Generation_Engine.md" "Details"
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-The CodeBoarding project is structured around a core AI Interpretation Layer that orchestrates the analysis of source code to generate architectural insights and documentation. User interactions, whether through a local application, VS Code extension, or GitHub Actions, are managed by the User Interface / API Gateway, which initiates and monitors analysis jobs. These jobs are persisted and managed by the Job Management & Persistence component. The AI Interpretation Layer relies on the Code Repository Access for fetching code and diffs, and the Static Analysis Engine for detailed code structure analysis. Finally, the Output Generation Engine transforms the AI-derived insights into various documentation and diagram formats, which are then presented back to the user via the User Interface / API Gateway.
+The system is structured around a core `AI Interpretation Layer` that orchestrates code analysis. User interactions, managed by the `User Interface / API Gateway`, initiate jobs whose states are persistently tracked by `Job Management & Persistence`. Source code is acquired and managed by `Code Repository Access`, providing raw code and diffs to both the `Static Analysis Engine` for structural analysis and directly to the `AI Interpretation Layer`. The `AI Interpretation Layer` synthesizes information from static analysis and code changes, leveraging LLMs to generate architectural insights. These insights are then transformed into diagrams and documentation by the `Output Generation Engine` before being presented back to the user via the `User Interface / API Gateway`. This modular design ensures clear separation of concerns, facilitating maintainability and scalability.
 
 ### User Interface / API Gateway [[Expand]](./User_Interface_API_Gateway.md)
-The external-facing layer for users and integrations (VS Code, GitHub Actions, local CLI) to interact with the system. It initiates analysis jobs and retrieves results.
+The primary entry point for users and external systems, orchestrating job creation and providing analysis results.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainlocal_app.py" target="_blank" rel="noopener noreferrer">`local_app`</a>
 
 
-### Job Management & Persistence
-Manages the lifecycle and state of all analysis jobs, storing job metadata, progress, and final results in a persistent database.
-
-
-**Related Classes/Methods**:
-
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainduckdb_crud.py" target="_blank" rel="noopener noreferrer">`duckdb_crud`</a>
-
-
-### Code Repository Access
-Provides an interface for interacting with source code repositories, including cloning, fetching updates, and generating code differences.
+### Job Management & Persistence [[Expand]](./Job_Management_Persistence.md)
+Manages the state and history of all analysis tasks, ensuring persistence of job data.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainrepo_utils/git_diff.py" target="_blank" rel="noopener noreferrer">`repo_utils.git_diff`</a>
+
+
+### Code Repository Access [[Expand]](./Code_Repository_Access.md)
+Responsible for fetching and managing source code from repositories, including generating code diffs.
+
+
+**Related Classes/Methods**:
+
+- `CodeRepository`:1-10
 
 
 ### Static Analysis Engine [[Expand]](./Static_Analysis_Engine.md)
-Performs deep structural analysis of source code using Language Server Protocol (LSP) clients to extract symbols, call graphs, class hierarchies, and dependencies.
+Performs structural analysis of source code and provides findings to the AI Interpretation Layer.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainstatic_analyzer/scanner.py" target="_blank" rel="noopener noreferrer">`static_analyzer.scanner`</a>
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainstatic_analyzer/__init__.py#L44-L67" target="_blank" rel="noopener noreferrer">`StaticAnalyzer`:44-67</a>
 
 
 ### AI Interpretation Layer [[Expand]](./AI_Interpretation_Layer.md)
-The core intelligence layer, managing interactions with Large Language Models (LLMs) through a framework of specialized agents. It orchestrates the flow of information between static analysis and LLM interpretation to generate architectural insights, detailed analysis, validation, and diff analysis.
+The core intelligence component, leveraging static analysis data and code diffs to generate architectural insights using LLM agents.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainagents/abstraction_agent.py" target="_blank" rel="noopener noreferrer">`agents.abstraction_agent.AbstractionAgent`</a>
+- `AIInterpreter`
 
 
-### Output Generation Engine [[Expand]](./Output_Generation_Engine.md)
-Transforms the structured architectural insights into a format suitable for various diagramming libraries and tools, and renders them into human-readable and machine-consumable documentation formats.
+### Output Generation Engine
+Transforms architectural insights into consumable documentation and diagrams.
 
 
 **Related Classes/Methods**:
 
-- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/maindiagram_analysis/diagram_generator.py" target="_blank" rel="noopener noreferrer">`diagram_analysis.diagram_generator`</a>
+- `OutputGenerator`
 
 
 ### Unclassified
