@@ -7,6 +7,7 @@ graph LR
     AI_Interpretation_Layer["AI Interpretation Layer"]
     Output_Generation_Engine["Output Generation Engine"]
     Unclassified["Unclassified"]
+    Unclassified["Unclassified"]
     User_Interface_API_Gateway -- "initiates & manages jobs" --> Job_Management_Persistence
     User_Interface_API_Gateway -- "triggers repository operations" --> Code_Repository_Access
     Job_Management_Persistence -- "provides job status" --> User_Interface_API_Gateway
@@ -20,9 +21,9 @@ graph LR
     Output_Generation_Engine -- "provides diagram data & documentation" --> User_Interface_API_Gateway
     click User_Interface_API_Gateway href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/User_Interface_API_Gateway.md" "Details"
     click Job_Management_Persistence href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Job_Management_Persistence.md" "Details"
-    click Code_Repository_Access href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Code_Repository_Access.md" "Details"
     click Static_Analysis_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Static_Analysis_Engine.md" "Details"
     click AI_Interpretation_Layer href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/AI_Interpretation_Layer.md" "Details"
+    click Output_Generation_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Output_Generation_Engine.md" "Details"
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
@@ -47,7 +48,7 @@ Manages the state and history of all analysis tasks, ensuring persistence of job
 
 
 
-### Code Repository Access [[Expand]](./Code_Repository_Access.md)
+### Code Repository Access
 Responsible for fetching and managing source code from repositories, including generating code diffs.
 
 
@@ -74,7 +75,7 @@ The core intelligence component, leveraging static analysis data and code diffs 
 - `AIInterpreter`
 
 
-### Output Generation Engine
+### Output Generation Engine [[Expand]](./Output_Generation_Engine.md)
 Transforms architectural insights into consumable documentation and diagrams.
 
 
@@ -82,6 +83,12 @@ Transforms architectural insights into consumable documentation and diagrams.
 
 - `OutputGenerator`
 
+
+### Unclassified
+Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
+
+
+**Related Classes/Methods**: _None_
 
 ### Unclassified
 Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)

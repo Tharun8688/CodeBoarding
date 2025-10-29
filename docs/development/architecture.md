@@ -78,82 +78,14 @@ Component for all unclassified files and utility functions (Utility functions/Ex
 
 ```mermaid
 graph LR
-    Document_Ingestion["Document Ingestion"]
-    Text_Splitter["Text Splitter"]
-    Vector_Store["Vector Store"]
-    Embeddings_Model["Embeddings Model"]
-    Language_Model_LLM_["Language Model (LLM)"]
-    Retrieval_Chain["Retrieval Chain"]
     Unclassified["Unclassified"]
-    Document_Ingestion -- "loads documents into" --> Text_Splitter
-    Text_Splitter -- "splits text for" --> Embeddings_Model
-    Embeddings_Model -- "generates embeddings for" --> Vector_Store
-    Vector_Store -- "stores embeddings from" --> Embeddings_Model
-    Vector_Store -- "retrieves context for" --> Retrieval_Chain
-    Retrieval_Chain -- "uses" --> Language_Model_LLM_
-    Language_Model_LLM_ -- "answers queries using" --> Retrieval_Chain
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-This graph represents the core functionality of a document processing and question-answering system. The main flow involves ingesting documents, processing them into a searchable format, and then using a language model to answer user queries based on the ingested content. Its purpose is to provide an intelligent interface for users to retrieve information from a collection of documents.
-
-### Document Ingestion
-Handles the loading and initial processing of various document types.
-
-
-**Related Classes/Methods**:
-
-- `langchain_community.document_loaders.pdf.PyPDFLoader`
-- `langchain_community.document_loaders.csv_loader.CSVLoader`
-
-
-### Text Splitter
-Breaks down large documents into smaller, manageable chunks for efficient processing and embedding.
-
-
-**Related Classes/Methods**:
-
-- `langchain.text_splitter.RecursiveCharacterTextSplitter`
-
-
-### Vector Store
-Stores and retrieves document embeddings, enabling semantic search.
-
-
-**Related Classes/Methods**:
-
-- `langchain_community.vectorstores.chroma.Chroma`
-
-
-### Embeddings Model
-Generates numerical representations (embeddings) of text chunks.
-
-
-**Related Classes/Methods**:
-
-- `langchain_community.embeddings.ollama.OllamaEmbeddings`
-
-
-### Language Model (LLM)
-Processes user queries and generates answers based on retrieved context.
-
-
-**Related Classes/Methods**:
-
-- `langchain_community.llms.ollama.Ollama`
-
-
-### Retrieval Chain
-Orchestrates the retrieval of relevant document chunks and passes them to the LLM for answer generation.
-
-
-**Related Classes/Methods**:
-
-- `langchain.chains.retrieval.create_retrieval_chain`
-
+The feedback highlights that the identified components (JobManager, PersistenceLayer, QueueingMechanism, OrchestrationEngine, APIServiceGateway, OutputGenerationEngine) have incorrect references, as no such modules, functions, or classes exist in the project. The `getFileStructure` output reveals a `.codeboarding` directory containing several `.json` and `.md` files, which likely hold architectural descriptions. To address the feedback, I will first examine the `overview.md` file within the `.codeboarding` directory to gain a high-level understanding of the project's architecture and then investigate other `.md` files for specific component definitions. This approach will help in identifying the correct references for the conceptual components.
 
 ### Unclassified
 Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
@@ -168,14 +100,61 @@ Component for all unclassified files and utility functions (Utility functions/Ex
 
 ```mermaid
 graph LR
+    DocumentationGenerator["DocumentationGenerator"]
+    DiagramGenerator["DiagramGenerator"]
+    TemplateProcessor["TemplateProcessor"]
+    OutputFormatter["OutputFormatter"]
     Unclassified["Unclassified"]
+    DocumentationGenerator -- "utilizes" --> TemplateProcessor
+    DocumentationGenerator -- "sends output to" --> OutputFormatter
+    DiagramGenerator -- "utilizes" --> TemplateProcessor
+    DiagramGenerator -- "sends output to" --> OutputFormatter
+    TemplateProcessor -- "provides templates to" --> DocumentationGenerator
+    TemplateProcessor -- "provides templates to" --> DiagramGenerator
+    OutputFormatter -- "receives content from" --> DocumentationGenerator
+    OutputFormatter -- "receives content from" --> DiagramGenerator
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
 
 ## Details
 
-The feedback highlights that the identified components (JobManager, PersistenceLayer, QueueingMechanism, OrchestrationEngine, APIServiceGateway, OutputGenerationEngine) have incorrect references, as no such modules, functions, or classes exist in the project. The `getFileStructure` output reveals a `.codeboarding` directory containing several `.json` and `.md` files, which likely hold architectural descriptions. To address the feedback, I will first examine the `overview.md` file within the `.codeboarding` directory to gain a high-level understanding of the project's architecture and then investigate other `.md` files for specific component definitions. This approach will help in identifying the correct references for the conceptual components.
+The core of this subsystem revolves around transforming structured architectural data into human-readable documentation and machine-readable diagram definitions. The DocumentationGenerator and DiagramGenerator components act as the primary orchestrators, leveraging a TemplateProcessor to ensure consistent formatting and a dedicated OutputFormatter to finalize the generated content. This structured approach ensures that both textual explanations and visual representations of the codebase are accurate, consistent, and adhere to defined standards.
+
+### DocumentationGenerator
+Responsible for generating human-readable documentation in formats like Markdown. It takes structured data and applies templates to produce coherent textual explanations of the codebase and architecture.
+
+
+**Related Classes/Methods**:
+
+- <a href="https://github.com/CodeBoarding/CodeBoarding/blob/mainoutput_generators/markdown.py#L42-L89" target="_blank" rel="noopener noreferrer">`output_generators.markdown.MarkdownGenerator`:42-89</a>
+
+
+### DiagramGenerator
+Creates machine-readable diagram definitions, likely in a format suitable for rendering by tools like Mermaid.js. It translates architectural relationships and structures into a visual representation.
+
+
+**Related Classes/Methods**:
+
+
+
+### TemplateProcessor
+A utility component that manages and applies various templates to ensure consistency in the generated documentation and diagrams.
+
+
+**Related Classes/Methods**:
+
+- `template_processor.TemplateProcessor`
+
+
+### OutputFormatter
+Ensures that the final generated output (Markdown and JSON) adheres to specified quality standards, syntax, and formatting rules before persistence.
+
+
+**Related Classes/Methods**:
+
+- `output_formatter.OutputFormatter`
+
 
 ### Unclassified
 Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
@@ -369,6 +348,7 @@ graph LR
     AI_Interpretation_Layer["AI Interpretation Layer"]
     Output_Generation_Engine["Output Generation Engine"]
     Unclassified["Unclassified"]
+    Unclassified["Unclassified"]
     User_Interface_API_Gateway -- "initiates & manages jobs" --> Job_Management_Persistence
     User_Interface_API_Gateway -- "triggers repository operations" --> Code_Repository_Access
     Job_Management_Persistence -- "provides job status" --> User_Interface_API_Gateway
@@ -382,9 +362,9 @@ graph LR
     Output_Generation_Engine -- "provides diagram data & documentation" --> User_Interface_API_Gateway
     click User_Interface_API_Gateway href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/User_Interface_API_Gateway.md" "Details"
     click Job_Management_Persistence href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Job_Management_Persistence.md" "Details"
-    click Code_Repository_Access href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Code_Repository_Access.md" "Details"
     click Static_Analysis_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Static_Analysis_Engine.md" "Details"
     click AI_Interpretation_Layer href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/AI_Interpretation_Layer.md" "Details"
+    click Output_Generation_Engine href "https://github.com/CodeBoarding/CodeBoarding/blob/main/.codeboarding/Output_Generation_Engine.md" "Details"
 ```
 
 [![CodeBoarding](https://img.shields.io/badge/Generated%20by-CodeBoarding-9cf?style=flat-square)](https://github.com/CodeBoarding/CodeBoarding)[![Demo](https://img.shields.io/badge/Try%20our-Demo-blue?style=flat-square)](https://www.codeboarding.org/diagrams)[![Contact](https://img.shields.io/badge/Contact%20us%20-%20contact@codeboarding.org-lightgrey?style=flat-square)](mailto:contact@codeboarding.org)
@@ -409,7 +389,7 @@ Manages the state and history of all analysis tasks, ensuring persistence of job
 
 
 
-### Code Repository Access [[Expand]](./Code_Repository_Access.md)
+### Code Repository Access
 Responsible for fetching and managing source code from repositories, including generating code diffs.
 
 
@@ -436,7 +416,7 @@ The core intelligence component, leveraging static analysis data and code diffs 
 - `AIInterpreter`
 
 
-### Output Generation Engine
+### Output Generation Engine [[Expand]](./Output_Generation_Engine.md)
 Transforms architectural insights into consumable documentation and diagrams.
 
 
@@ -444,6 +424,12 @@ Transforms architectural insights into consumable documentation and diagrams.
 
 - `OutputGenerator`
 
+
+### Unclassified
+Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)
+
+
+**Related Classes/Methods**: _None_
 
 ### Unclassified
 Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)

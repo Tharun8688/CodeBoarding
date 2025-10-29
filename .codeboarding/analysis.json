@@ -13,8 +13,6 @@
         }
       ],
       "assigned_files": [
-        "vscode_constants.py",
-        "vscode_runnable.py",
         "local_app.py",
         "github_action.py"
       ],
@@ -49,10 +47,9 @@
       ],
       "assigned_files": [
         "repo_utils/__init__.py",
-        "repo_utils/git_diff.py",
-        "repo_utils/errors.py"
+        "repo_utils/git_diff.py"
       ],
-      "can_expand": true
+      "can_expand": false
     },
     {
       "name": "Static Analysis Engine",
@@ -144,7 +141,22 @@
         "output_generators/markdown.py",
         "diagram_analysis/__init__.py",
         "diagram_analysis/analysis_json.py",
-        "diagram_analysis/diagram_generator.py",
+        "diagram_analysis/diagram_generator.py"
+      ],
+      "can_expand": true
+    },
+    {
+      "name": "Unclassified",
+      "description": "Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)",
+      "referenced_source_code": [],
+      "assigned_files": [
+        "vscode_constants.py",
+        "vscode_runnable.py",
+        "utils.py",
+        "setup.py",
+        "demo.py",
+        "logging_config.py",
+        "repo_utils/errors.py",
         "diagram_analysis/version.py"
       ],
       "can_expand": false
@@ -153,12 +165,7 @@
       "name": "Unclassified",
       "description": "Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)",
       "referenced_source_code": [],
-      "assigned_files": [
-        "utils.py",
-        "setup.py",
-        "demo.py",
-        "logging_config.py"
-      ],
+      "assigned_files": [],
       "can_expand": false
     }
   ],

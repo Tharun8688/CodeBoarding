@@ -1,0 +1,127 @@
+{
+  "description": "The core of this subsystem revolves around transforming structured architectural data into human-readable documentation and machine-readable diagram definitions. The DocumentationGenerator and DiagramGenerator components act as the primary orchestrators, leveraging a TemplateProcessor to ensure consistent formatting and a dedicated OutputFormatter to finalize the generated content. This structured approach ensures that both textual explanations and visual representations of the codebase are accurate, consistent, and adhere to defined standards.",
+  "components": [
+    {
+      "name": "DocumentationGenerator",
+      "description": "Responsible for generating human-readable documentation in formats like Markdown. It takes structured data and applies templates to produce coherent textual explanations of the codebase and architecture.",
+      "referenced_source_code": [
+        {
+          "qualified_name": "output_generators.markdown.MarkdownGenerator",
+          "reference_file": "output_generators/markdown.py",
+          "reference_start_line": 42,
+          "reference_end_line": 89
+        }
+      ],
+      "assigned_files": [
+        "../../output_generators/markdown.py",
+        "../../output_generators/sphinx.py",
+        "../../output_generators/mdx.py"
+      ],
+      "can_expand": true
+    },
+    {
+      "name": "DiagramGenerator",
+      "description": "Creates machine-readable diagram definitions, likely in a format suitable for rendering by tools like Mermaid.js. It translates architectural relationships and structures into a visual representation.",
+      "referenced_source_code": [
+        {
+          "qualified_name": "output_generators.mermaid.MermaidGenerator",
+          "reference_file": "",
+          "reference_start_line": null,
+          "reference_end_line": null
+        }
+      ],
+      "assigned_files": [
+        "output_generators/mermaid.py",
+        "../../diagram_analysis/diagram_generator.py",
+        "../../diagram_analysis/analysis_json.py"
+      ],
+      "can_expand": true
+    },
+    {
+      "name": "TemplateProcessor",
+      "description": "A utility component that manages and applies various templates to ensure consistency in the generated documentation and diagrams.",
+      "referenced_source_code": [
+        {
+          "qualified_name": "template_processor.TemplateProcessor",
+          "reference_file": "template_processor.py",
+          "reference_start_line": null,
+          "reference_end_line": null
+        }
+      ],
+      "assigned_files": [
+        "template_processor.py"
+      ],
+      "can_expand": false
+    },
+    {
+      "name": "OutputFormatter",
+      "description": "Ensures that the final generated output (Markdown and JSON) adheres to specified quality standards, syntax, and formatting rules before persistence.",
+      "referenced_source_code": [
+        {
+          "qualified_name": "output_formatter.OutputFormatter",
+          "reference_file": "output_formatter.py",
+          "reference_start_line": null,
+          "reference_end_line": null
+        }
+      ],
+      "assigned_files": [
+        "output_formatter.py"
+      ],
+      "can_expand": false
+    },
+    {
+      "name": "Unclassified",
+      "description": "Component for all unclassified files and utility functions (Utility functions/External Libraries/Dependencies)",
+      "referenced_source_code": [],
+      "assigned_files": [
+        "../../output_generators/__init__.py",
+        "../../diagram_analysis/__init__.py",
+        "../../output_generators/html.py",
+        "../../output_generators/html_template.py"
+      ],
+      "can_expand": false
+    }
+  ],
+  "components_relations": [
+    {
+      "relation": "utilizes",
+      "src_name": "DocumentationGenerator",
+      "dst_name": "TemplateProcessor"
+    },
+    {
+      "relation": "sends output to",
+      "src_name": "DocumentationGenerator",
+      "dst_name": "OutputFormatter"
+    },
+    {
+      "relation": "utilizes",
+      "src_name": "DiagramGenerator",
+      "dst_name": "TemplateProcessor"
+    },
+    {
+      "relation": "sends output to",
+      "src_name": "DiagramGenerator",
+      "dst_name": "OutputFormatter"
+    },
+    {
+      "relation": "provides templates to",
+      "src_name": "TemplateProcessor",
+      "dst_name": "DocumentationGenerator"
+    },
+    {
+      "relation": "provides templates to",
+      "src_name": "TemplateProcessor",
+      "dst_name": "DiagramGenerator"
+    },
+    {
+      "relation": "receives content from",
+      "src_name": "OutputFormatter",
+      "dst_name": "DocumentationGenerator"
+    },
+    {
+      "relation": "receives content from",
+      "src_name": "OutputFormatter",
+      "dst_name": "DiagramGenerator"
+    }
+  ]
+}
